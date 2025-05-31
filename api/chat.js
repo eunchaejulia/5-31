@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     const prompt = req.body.prompt;
 
     const response = await fetch(
-      "https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct",
+      "https://api-inference.huggingface.co/models/google/flan-t5-small",
       {
         method: "POST",
         headers: {
@@ -12,7 +12,7 @@ export default async function handler(req, res) {
         },
         body: JSON.stringify({
           inputs: prompt,
-          parameters: { max_new_tokens: 200, temperature: 0.7 },
+          parameters: { max_new_tokens: 100, temperature: 0.7 },
         }),
       }
     );
@@ -26,7 +26,7 @@ export default async function handler(req, res) {
       throw new Error(`Invalid JSON: ${text}`);
     }
 
-    const reply = data?.[0]?.generated_text || "모델 응답 실패";
+    const reply = data?.[0]?.generated_text || data?.[0]?.output || "모델 응답 실패";
     res.status(200).json({ reply });
   } catch (err) {
     console.error("🔴 오류 발생:", err);

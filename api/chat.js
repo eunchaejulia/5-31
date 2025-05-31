@@ -1,23 +1,35 @@
 export default async function handler(req, res) {
-  const prompt = req.body.prompt;
+  try {
+    const prompt = req.body.prompt;
 
-  const response = await fetch(
-    "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.HUGGINGFACE_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        inputs: prompt,
-        parameters: { max_new_tokens: 200, temperature: 0.7 },
-      }),
+    const response = await fetch(
+      "https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.HUGGINGFACE_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          inputs: prompt,
+          parameters: { max_new_tokens: 200, temperature: 0.7 },
+        }),
+      }
+    );
+
+    const text = await response.text();
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (jsonErr) {
+      throw new Error(`Invalid JSON: ${text}`);
     }
-  );
 
-  const data = await response.json();
-  const text = data?.[0]?.generated_text || "응답 오류 발생";
-
-  res.status(200).json({ reply: text });
+    const reply = data?.[0]?.generated_text || "모델 응답 실패";
+    res.status(200).json({ reply });
+  } catch (err) {
+    console.error("🔴 오류 발생:", err);
+    res.status(500).json({ reply: `서버 오류: ${err.message}` });
+  }
 }

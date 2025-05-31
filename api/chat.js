@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     const prompt = req.body.prompt;
 
     const response = await fetch(
-      "https://api-inference.huggingface.co/models/google/flan-t5-small",
+      "https://api-inference.huggingface.co/models/bigscience/bloomz-560m",
       {
         method: "POST",
         headers: {
@@ -26,7 +26,7 @@ export default async function handler(req, res) {
       throw new Error(`Invalid JSON: ${text}`);
     }
 
-    const reply = data?.[0]?.generated_text || data?.[0]?.output || "모델 응답 실패";
+    const reply = data?.[0]?.generated_text || "모델 응답 실패";
     res.status(200).json({ reply });
   } catch (err) {
     console.error("🔴 오류 발생:", err);

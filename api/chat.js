@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    const reply = data?.data?.[0] || "모델 응답 실패";
+    const reply = data?.[0]?.generated_text || "모델 응답 실패";
 
     res.status(200).json({ reply });
   } catch (err) {
